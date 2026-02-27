@@ -27,6 +27,9 @@ const categories = JSON.parse(fs.readFileSync(wordsPath, 'utf8'));
 
 const app = express();
 app.use(cors());
+app.get('/', (req, res) => {
+  res.send('Guess the Impostor server is running.');
+});
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 const server = http.createServer(app);
