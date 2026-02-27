@@ -272,6 +272,17 @@ button:disabled {
   gap: 10px;
 }
 
+.player-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-clue {
+  font-size: 0.85rem;
+  color: rgba(27, 27, 27, 0.7);
+}
+
 .player-name {
   display: inline-flex;
   align-items: center;

@@ -309,6 +309,7 @@ export default function App() {
         <Voting
           players={players}
           votes={votes}
+          clues={clues}
           playerId={playerId}
           onSubmitVote={handleVote}
           timerMs={timerMs}

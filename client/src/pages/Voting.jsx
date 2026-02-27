@@ -8,9 +8,16 @@ function formatMs(ms) {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export default function Voting({ players, votes, playerId, onSubmitVote, timerMs }) {
+export default function Voting({ players, votes, clues, playerId, onSubmitVote, timerMs }) {
   const alivePlayers = useMemo(() => players.filter((p) => p.alive), [players]);
   const votedIds = useMemo(() => new Set(votes.map((v) => v.voterId)), [votes]);
+  const clueByPlayer = useMemo(() => {
+    const map = new Map();
+    clues.forEach((item) => {
+      map.set(item.playerId, item.clue);
+    });
+    return map;
+  }, [clues]);
   const hasVoted = votedIds.has(playerId);
   const timeUp = timerMs <= 0;
 
@@ -30,7 +37,10 @@ export default function Voting({ players, votes, playerId, onSubmitVote, timerMs
             <div key={player.id} className="list-item status-card player-row">
               <div className="player-inline">
                 <BearAvatar color={player.color} size={30} />
-                <span className="player-name">{player.name}</span>
+                <div className="player-stack">
+                  <span className="player-name">{player.name}</span>
+                  <span className="player-clue">{clueByPlayer.get(player.id) || 'No clue submitted'}</span>
+                </div>
               </div>
               <button
                 onClick={() => onSubmitVote(player.id)}
