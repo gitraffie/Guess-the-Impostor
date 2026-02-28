@@ -195,24 +195,181 @@ button:disabled {
   color: var(--warm-ink);
 }
 
-.elimination-backdrop {
-  background: radial-gradient(circle at center, rgba(20, 16, 6, 0.55), rgba(20, 16, 6, 0.8));
-  animation: fadeIn 200ms ease-out;
+.elimination-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 40;
+  background: radial-gradient(circle at center, rgba(20, 16, 6, 0.55), rgba(20, 16, 6, 0.88));
+  overflow: hidden;
+  animation: fadeIn 220ms ease-out;
 }
 
-.elimination-modal {
+.elimination-vignette {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), rgba(10, 8, 4, 0.85) 70%);
+  pointer-events: none;
+  animation: eliminationVignette 2200ms ease-out;
+}
+
+.elimination-shake-layer {
+  position: relative;
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.elimination-stage {
+  position: relative;
   text-align: center;
-  background: #111;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: eliminationPulse 2400ms ease-out;
+  padding: 26px 30px 34px;
+  border-radius: 24px;
+  background: rgba(9, 9, 9, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
 }
 
-.elimination-modal h3 {
-  margin: 0;
-  font-size: 1.6rem;
+.elimination-avatar {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  padding: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  animation: eliminationSequence 2200ms ease-in-out forwards;
+}
+
+.elimination-burst {
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.7), rgba(255, 183, 3, 0.2), transparent 65%);
+  opacity: 0;
+  filter: blur(2px);
+  animation: eliminationBurst 900ms ease-out 600ms forwards;
+}
+
+.elimination-label {
+  margin: 14px 0 0;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.5px;
+}
+
+.elimination-message {
+  margin: 12px 0 0;
+  font-size: 1.5rem;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: eliminationMessage 600ms ease-out 1400ms forwards;
+}
+
+.app.elimination-shake {
+  animation: cameraShake 520ms ease-in-out;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.result-flip-card {
+  position: relative;
+  height: 190px;
+  perspective: 1000px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: resultCardEnter 450ms ease-out forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.result-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: resultCardFlip 800ms ease-in-out forwards;
+  animation-delay: calc(var(--delay, 0ms) + 450ms);
+}
+
+.result-flip-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  backface-visibility: hidden;
+  background: #fffaf0;
+  border: 1px solid rgba(27, 27, 27, 0.1);
+  box-shadow: 0 16px 30px rgba(85, 63, 7, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.result-front {
+  background: linear-gradient(160deg, #fff6e5 0%, #f8e4be 100%);
+}
+
+.result-back {
+  transform: rotateX(180deg);
+  background: linear-gradient(160deg, #f7efd9 0%, #f1dbad 100%);
+}
+
+.result-name {
+  font-weight: 600;
+  color: var(--warm-ink);
+}
+
+.result-role {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--warm-ink);
+}
+
+.result-highlight {
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(46, 125, 50, 0.15);
+  color: #2a7b3f;
+}
+
+.result-flip-card.winner-impostor .result-back {
+  background: linear-gradient(160deg, #ffe1db 0%, #f7b8a9 100%);
+  box-shadow: 0 18px 34px rgba(176, 0, 0, 0.2);
+}
+
+.result-flip-card.winner-impostor .result-highlight {
+  background: rgba(176, 0, 0, 0.2);
+  color: #b00000;
+}
+
+.result-flip-card.winner-player .result-back {
+  background: linear-gradient(160deg, #e9f6e9 0%, #c9e9c9 100%);
+  box-shadow: 0 18px 34px rgba(42, 123, 63, 0.2);
+}
+
+.result-secret {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.result-secret.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .turn-name {
@@ -493,18 +650,100 @@ button:disabled {
   margin-bottom: 16px;
 }
 
-@keyframes eliminationPulse {
+@keyframes eliminationSequence {
   0% {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  20% {
-    transform: scale(1.02);
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1);
     opacity: 1;
+  }
+  18% {
+    transform: translate3d(-6px, 2px, 0) rotate(-2deg);
+  }
+  30% {
+    transform: translate3d(6px, -3px, 0) rotate(2deg);
+  }
+  42% {
+    transform: translate3d(-4px, 3px, 0) rotate(-1deg);
+  }
+  55% {
+    transform: scale(1.05);
+    filter: brightness(1.8);
+  }
+  70% {
+    transform: scale(1.12);
+    filter: brightness(1.4);
   }
   100% {
+    transform: scale(0.7);
+    opacity: 0;
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes eliminationBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 0.9;
     transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes eliminationMessage {
+  to {
     opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes eliminationVignette {
+  0% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes cameraShake {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(-4px, 2px, 0);
+  }
+  40% {
+    transform: translate3d(3px, -3px, 0);
+  }
+  60% {
+    transform: translate3d(-2px, -1px, 0);
+  }
+  80% {
+    transform: translate3d(2px, 3px, 0);
+  }
+}
+
+@keyframes resultCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes resultCardFlip {
+  to {
+    transform: rotateX(180deg);
   }
 }
 

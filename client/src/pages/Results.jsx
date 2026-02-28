@@ -1,4 +1,5 @@
-import BearAvatar from '../components/BearAvatar.jsx';
+import { useEffect, useMemo, useState } from 'react';
+import ResultFlipCard from '../components/ResultFlipCard.jsx';
 
 export default function Results({
   players,
@@ -11,57 +12,65 @@ export default function Results({
   connected,
   hostId
 }) {
-  const winnerPlayers = result && result.winnerNames
-    ? result.winnerNames
-        .map((name) => players.find((player) => player.name === name))
-        .filter(Boolean)
-    : [];
-  const impostorPlayer = result
-    ? players.find((player) => player.name === result.impostorName)
-    : null;
+  const [showSecretWord, setShowSecretWord] = useState(false);
+
+  const winnerNames = useMemo(
+    () => (result && result.winnerNames ? result.winnerNames : []),
+    [result]
+  );
+
+  useEffect(() => {
+    setShowSecretWord(false);
+    if (!players.length) return undefined;
+
+    const entryDuration = 450;
+    const stagger = 180;
+    const flipDuration = 800;
+    const baseDelay = 200;
+    const totalDelay =
+      baseDelay + entryDuration + flipDuration + (players.length - 1) * stagger + 200;
+
+    const timeout = setTimeout(() => setShowSecretWord(true), totalDelay);
+    return () => clearTimeout(timeout);
+  }, [players.length, result]);
+
+  const resultTitle = result ? result.winner || 'Game Over' : 'Game Over';
+  const resultReason = result ? result.reason : '';
 
   return (
     <div className="card">
       <h2>Results</h2>
       {result && (
         <div className="panel full">
-          <h3>Winner</h3>
-          {winnerPlayers.length > 0 ? (
-            <div className="list">
-              {winnerPlayers.map((player) => (
-                <div key={`winner-${player.id}`} className="list-item player-row">
-                  <BearAvatar color={player.color} size={30} />
-                  <span className="player-name">{player.name}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>{result.winner}</p>
-          )}
-          <p>{result.reason}</p>
+          <h3>{resultTitle}</h3>
+          {resultReason && <p>{resultReason}</p>}
         </div>
       )}
 
       <div className="panel full">
+        <h3>Player Results</h3>
+        <div className="result-grid">
+          {players.map((player, index) => {
+            const isImpostor = Boolean(result && player.name === result.impostorName);
+            const isWinner = winnerNames.includes(player.name);
+
+            return (
+              <ResultFlipCard
+                key={player.id}
+                player={player}
+                isWinner={isWinner}
+                isImpostor={isImpostor}
+                style={{ '--delay': `${index * 180}ms` }}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      <div className={`panel full result-secret ${showSecretWord ? 'show' : ''}`}>
         <h3>Secret Word</h3>
         <p>{secretWord}</p>
       </div>
-
-      {result && (
-        <div className="panel full">
-          <h3>Impostor</h3>
-          {impostorPlayer ? (
-            <div className="list">
-              <div className="list-item player-row">
-                <BearAvatar color={impostorPlayer.color} size={30} />
-                <span className="player-name">{impostorPlayer.name}</span>
-              </div>
-            </div>
-          ) : (
-            <p>{result.impostorName}</p>
-          )}
-        </div>
-      )}
 
       <div className="panel full">
         <h3>Next</h3>

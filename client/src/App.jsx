@@ -5,6 +5,7 @@ import GameRound from './pages/GameRound.jsx';
 import Voting from './pages/Voting.jsx';
 import Results from './pages/Results.jsx';
 import BearAvatar from './components/BearAvatar.jsx';
+import EliminationAnimation from './components/EliminationAnimation.jsx';
 import logo from '../images/guess_the_impostor_logo.png';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
@@ -225,8 +226,23 @@ export default function App() {
         : 'players-win'
       : '';
 
+  const eliminatedPlayer = eliminatedPlayerId
+    ? players.find((player) => player.id === eliminatedPlayerId)
+    : null;
+  const eliminationPlayer =
+    eliminatedPlayer && playerId
+      ? { ...eliminatedPlayer, isLocal: eliminatedPlayer.id === playerId }
+      : eliminatedPlayer;
+  const eliminationColor = eliminatedPlayer && eliminatedPlayer.color
+    ? eliminatedPlayer.color
+    : '#1b1b1b';
+
   return (
-    <div className={`app ${isSpectator ? 'spectator' : ''} ${winnerClass}`}>
+    <div
+      className={`app ${isSpectator ? 'spectator' : ''} ${winnerClass} ${
+        phase === 'elimination' ? 'elimination-shake' : ''
+      }`}
+    >
       <header className="header">
         <div className="brand">
           <img className="logo" src={logo} alt="Guess the Impostor logo" />
@@ -340,15 +356,10 @@ export default function App() {
       )}
 
       {phase === 'elimination' && (
-        <div className="modal-backdrop elimination-backdrop">
-          <div className="modal elimination-modal">
-            <h3>
-              {eliminatedPlayerId && eliminatedPlayerId === playerId
-                ? 'You were eliminated.'
-                : eliminationMessage || 'Someone has been eliminated.'}
-            </h3>
-          </div>
-        </div>
+        <EliminationAnimation
+          eliminatedPlayer={eliminationPlayer}
+          color={eliminationColor}
+        />
       )}
 
       {showLeaveConfirm && (
