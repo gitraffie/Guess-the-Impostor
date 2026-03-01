@@ -14,6 +14,7 @@
   --accent-soft: rgba(255, 183, 3, 0.2);
   --soft-border: rgba(27, 27, 27, 0.08);
   --modal-layer: 9999;
+  --overlay-layer: 11000;
 }
 
 * {
@@ -158,6 +159,60 @@ button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+.button-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #ffffff;
+  animation: spin 900ms linear infinite;
+}
+
+.ghost .button-spinner {
+  border-color: rgba(27, 27, 27, 0.3);
+  border-top-color: #1b1b1b;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 16, 6, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: var(--overlay-layer);
+}
+
+.loading-panel {
+  min-width: min(320px, 90vw);
+  padding: 24px 28px;
+  border-radius: 24px;
+  background: rgba(255, 250, 240, 0.96);
+  box-shadow: 0 26px 70px rgba(85, 63, 7, 0.35);
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 183, 3, 0.25);
+  border-top-color: #ffb703;
+  animation: spin 1000ms linear infinite;
+}
+
+.loading-message {
+  margin: 0;
+  font-weight: 600;
+  color: var(--warm-ink);
 }
 
 .ghost {
@@ -763,6 +818,12 @@ button:disabled {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

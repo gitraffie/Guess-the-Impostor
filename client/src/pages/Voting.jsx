@@ -8,7 +8,15 @@ function formatMs(ms) {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export default function Voting({ players, votes, clues, playerId, onSubmitVote, timerMs }) {
+export default function Voting({
+  players,
+  votes,
+  clues,
+  playerId,
+  onSubmitVote,
+  timerMs,
+  isSubmittingVote
+}) {
   const alivePlayers = useMemo(() => players.filter((p) => p.alive), [players]);
   const votedIds = useMemo(() => new Set(votes.map((v) => v.voterId)), [votes]);
   const clueByPlayer = useMemo(() => {
@@ -44,9 +52,10 @@ export default function Voting({ players, votes, clues, playerId, onSubmitVote, 
               </div>
               <button
                 onClick={() => onSubmitVote(player.id)}
-                disabled={hasVoted || timeUp}
+                disabled={hasVoted || timeUp || isSubmittingVote}
               >
                 Vote
+                {isSubmittingVote ? <span className="button-spinner" aria-hidden="true" /> : null}
               </button>
             </div>
           ))}

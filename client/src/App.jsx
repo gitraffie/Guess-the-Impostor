@@ -6,6 +6,7 @@ import Voting from './pages/Voting.jsx';
 import Results from './pages/Results.jsx';
 import BearAvatar from './components/BearAvatar.jsx';
 import EliminationAnimation from './components/EliminationAnimation.jsx';
+import LoadingOverlay from './components/LoadingOverlay.jsx';
 import logo from '../images/guess_the_impostor_logo.png';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
@@ -27,10 +28,13 @@ export default function App() {
   const [error, setError] = useState('');
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [hasConnectedOnce, setHasConnectedOnce] = useState(false);
   const [currentTurnPlayerId, setCurrentTurnPlayerId] = useState(null);
   const [replayPending, setReplayPending] = useState(false);
   const [eliminationMessage, setEliminationMessage] = useState('');
   const [eliminatedPlayerId, setEliminatedPlayerId] = useState('');
+  const [pendingAction, setPendingAction] = useState('');
+  const [pendingMessage, setPendingMessage] = useState('');
 
   function resetClientState() {
     setPhase('lobby');
@@ -50,6 +54,28 @@ export default function App() {
     setReplayPending(false);
     setEliminationMessage('');
     setEliminatedPlayerId('');
+    setPendingAction('');
+    setPendingMessage('');
+  }
+
+  function beginLoading(action, message) {
+    setPendingAction(action);
+    setPendingMessage(message || '');
+  }
+
+  function endLoading(action) {
+    setPendingAction((prev) => {
+      if (prev === action) {
+        setPendingMessage('');
+        return '';
+      }
+      return prev;
+    });
+  }
+
+  function clearLoading() {
+    setPendingAction('');
+    setPendingMessage('');
   }
 
   useEffect(() => {
@@ -58,10 +84,12 @@ export default function App() {
       setPlayerId(id);
       applyState(state);
       setError('');
+      clearLoading();
     };
 
     const handleRoomState = (state) => {
       applyState(state);
+      clearLoading();
     };
 
     const handleSecretWord = ({ word }) => {
@@ -85,19 +113,26 @@ export default function App() {
 
     const handleError = ({ message }) => {
       setError(message);
+      clearLoading();
     };
 
     const handleLeftRoom = () => {
       resetClientState();
+      clearLoading();
     };
 
     const handleRoomClosed = ({ message }) => {
       resetClientState();
       setError(message || 'Room closed.');
+      clearLoading();
     };
 
     const handleConnect = () => {
       setConnected(true);
+      setHasConnectedOnce(true);
+      if (pendingAction === 'reconnect') {
+        clearLoading();
+      }
     };
 
     const handleDisconnect = () => {
@@ -106,6 +141,9 @@ export default function App() {
 
     const handleConnectError = () => {
       setConnected(false);
+      if (!hasConnectedOnce) {
+        beginLoading('reconnect', 'Connecting to server...');
+      }
     };
 
     socket.on('room_joined', handleRoomJoined);
@@ -136,7 +174,7 @@ export default function App() {
       socket.off('disconnect', handleDisconnect);
       socket.off('connect_error', handleConnectError);
     };
-  }, [socket]);
+  }, [socket, hasConnectedOnce, pendingAction]);
 
   function applyState(state) {
     setPhase(state.phase);
@@ -165,22 +203,27 @@ export default function App() {
   }
 
   function handleCreate(name, color) {
+    beginLoading('create_room', 'Creating room...');
     socket.emit('create_room', { name, color });
   }
 
   function handleJoin(code, name, color) {
+    beginLoading('join_room', 'Joining room...');
     socket.emit('join_room', { code, name, color });
   }
 
   function handleStart() {
+    beginLoading('start_round', 'Starting round...');
     socket.emit('start_round', { code: roomCode });
   }
 
   function handleClue(clue) {
+    beginLoading('submit_clue', 'Submitting clue...');
     socket.emit('submit_clue', { code: roomCode, playerId, clue });
   }
 
   function handleVote(targetId) {
+    beginLoading('submit_vote', 'Submitting vote...');
     socket.emit('submit_vote', { code: roomCode, playerId, targetId });
   }
 
@@ -190,12 +233,15 @@ export default function App() {
       setError('Not connected to server.');
       return;
     }
+    beginLoading('leave_room', 'Leaving room...');
     socket.emit('leave_room', { code: roomCode }, (response) => {
       if (!response || !response.ok) {
         setError(response && response.message ? response.message : 'Failed to leave room.');
+        endLoading('leave_room');
         return;
       }
       setShowLeaveConfirm(false);
+      endLoading('leave_room');
     });
   }
 
@@ -205,10 +251,12 @@ export default function App() {
       setError('Not connected to server.');
       return;
     }
+    beginLoading('play_again', 'Preparing next round...');
     socket.emit('play_again', { code: roomCode, playerId }, (response) => {
       if (!response || !response.ok) {
         setError(response && response.message ? response.message : 'Failed to reset room.');
       }
+      endLoading('play_again');
     });
   }
 
@@ -237,6 +285,19 @@ export default function App() {
     ? eliminatedPlayer.color
     : '#1b1b1b';
 
+  const isReconnecting = !connected && hasConnectedOnce;
+  const loadingVisible = Boolean(pendingAction) || isReconnecting;
+  const loadingMessage = isReconnecting ? 'Reconnecting to server...' : pendingMessage;
+  const loadingFlags = {
+    isCreating: pendingAction === 'create_room',
+    isJoining: pendingAction === 'join_room',
+    isStarting: pendingAction === 'start_round',
+    isSubmittingClue: pendingAction === 'submit_clue',
+    isSubmittingVote: pendingAction === 'submit_vote',
+    isPlayingAgain: pendingAction === 'play_again',
+    isLeaving: pendingAction === 'leave_room'
+  };
+
   return (
     <div
       className={`app ${isSpectator ? 'spectator' : ''} ${winnerClass} ${
@@ -264,6 +325,10 @@ export default function App() {
           isHost={playerId && hostId && playerId === hostId}
           hostId={hostId}
           replayPending={replayPending}
+          isCreating={loadingFlags.isCreating}
+          isJoining={loadingFlags.isJoining}
+          isStarting={loadingFlags.isStarting}
+          isLeaving={loadingFlags.isLeaving}
         />
       )}
 
@@ -278,6 +343,7 @@ export default function App() {
           playerId={playerId}
           currentTurnPlayerId={currentTurnPlayerId}
           onSubmitClue={handleClue}
+          isSubmittingClue={loadingFlags.isSubmittingClue}
         />
       )}
 
@@ -329,6 +395,7 @@ export default function App() {
           playerId={playerId}
           onSubmitVote={handleVote}
           timerMs={timerMs}
+          isSubmittingVote={loadingFlags.isSubmittingVote}
         />
       )}
 
@@ -343,6 +410,8 @@ export default function App() {
           onLeave={() => setShowLeaveConfirm(true)}
           connected={connected}
           hostId={hostId}
+          isPlayingAgain={loadingFlags.isPlayingAgain}
+          isLeaving={loadingFlags.isLeaving}
         />
       )}
 
@@ -368,14 +437,19 @@ export default function App() {
             <h3>Leave room?</h3>
             <p>You will be removed from the current game.</p>
             <div className="row">
-              <button className="ghost" onClick={() => setShowLeaveConfirm(false)}>
+              <button className="ghost" onClick={() => setShowLeaveConfirm(false)} disabled={loadingFlags.isLeaving}>
                 Cancel
               </button>
-              <button onClick={handleLeave}>Leave</button>
+              <button onClick={handleLeave} disabled={loadingFlags.isLeaving}>
+                Leave
+                {loadingFlags.isLeaving ? <span className="button-spinner" aria-hidden="true" /> : null}
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      <LoadingOverlay visible={loadingVisible} message={loadingMessage} />
     </div>
   );
 }

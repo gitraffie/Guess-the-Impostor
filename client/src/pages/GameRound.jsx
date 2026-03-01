@@ -18,7 +18,8 @@ export default function GameRound({
   category,
   onSubmitClue,
   playerId,
-  currentTurnPlayerId
+  currentTurnPlayerId,
+  isSubmittingClue
 }) {
   const [clue, setClue] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -98,7 +99,7 @@ export default function GameRound({
               value={clue}
               onChange={(event) => setClue(event.target.value)}
               placeholder="Enter a single clue"
-              disabled={!isMyTurn || submitted}
+              disabled={!isMyTurn || submitted || isSubmittingClue}
             />
             <button
               onClick={() => {
@@ -106,9 +107,10 @@ export default function GameRound({
                 setClue('');
                 setSubmitted(true);
               }}
-              disabled={!clue.trim() || submitted || !isMyTurn}
+              disabled={!clue.trim() || submitted || !isMyTurn || isSubmittingClue}
             >
               Submit
+              {isSubmittingClue ? <span className="button-spinner" aria-hidden="true" /> : null}
             </button>
           </div>
           <p>{submittedCount} of {players.length} clues submitted.</p>

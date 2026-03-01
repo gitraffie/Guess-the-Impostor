@@ -11,7 +11,11 @@ export default function Lobby({
   onLeave,
   isHost,
   hostId,
-  replayPending
+  replayPending,
+  isCreating,
+  isJoining,
+  isStarting,
+  isLeaving
 }) {
   const [name, setName] = useState('');
   const [joinCode, setJoinCode] = useState('');
@@ -74,10 +78,19 @@ export default function Lobby({
                 ))}
               </div>
             </div>
-            <button onClick={() => onCreate(name, selectedColor)} disabled={!canSubmit}>
+            <button
+              onClick={() => onCreate(name, selectedColor)}
+              disabled={!canSubmit || isCreating}
+            >
               Create
+              {isCreating ? <span className="button-spinner" aria-hidden="true" /> : null}
             </button>
-            <button type="button" className="ghost" onClick={() => setShowJoinModal(true)}>
+            <button
+              type="button"
+              className="ghost"
+              onClick={() => setShowJoinModal(true)}
+              disabled={isCreating || isJoining}
+            >
               + Join Room
             </button>
           </div>
@@ -124,10 +137,14 @@ export default function Lobby({
               </div>
             </div>
             <div className="row">
-              <button onClick={() => onJoin(joinCode, name, selectedColor)} disabled={!canSubmit}>
+              <button
+                onClick={() => onJoin(joinCode, name, selectedColor)}
+                disabled={!canSubmit || isJoining}
+              >
                 Join
+                {isJoining ? <span className="button-spinner" aria-hidden="true" /> : null}
               </button>
-              <button className="ghost" onClick={() => setShowJoinModal(false)}>
+              <button className="ghost" onClick={() => setShowJoinModal(false)} disabled={isJoining}>
                 Cancel
               </button>
             </div>
@@ -156,11 +173,17 @@ export default function Lobby({
           <div className="row">
             <button
               onClick={onStart}
-              disabled={players.length < 3 || !isHost || (replayPending && !allReady)}
+              disabled={
+                players.length < 3 ||
+                !isHost ||
+                (replayPending && !allReady) ||
+                isStarting
+              }
             >
               Start Round
+              {isStarting ? <span className="button-spinner" aria-hidden="true" /> : null}
             </button>
-            <button className="ghost" onClick={onLeave}>
+            <button className="ghost" onClick={onLeave} disabled={isLeaving}>
               Leave Room
             </button>
           </div>

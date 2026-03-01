@@ -10,7 +10,9 @@ export default function Results({
   onPlayAgain,
   onLeave,
   connected,
-  hostId
+  hostId,
+  isPlayingAgain,
+  isLeaving
 }) {
   const [showSecretWord, setShowSecretWord] = useState(false);
 
@@ -75,11 +77,13 @@ export default function Results({
       <div className="panel full">
         <h3>Next</h3>
         <div className="row">
-          <button onClick={onPlayAgain} disabled={!connected}>
+          <button onClick={onPlayAgain} disabled={!connected || isPlayingAgain}>
             Play Again
+            {isPlayingAgain ? <span className="button-spinner" aria-hidden="true" /> : null}
           </button>
-          <button className="ghost" onClick={onLeave} disabled={!connected}>
+          <button className="ghost" onClick={onLeave} disabled={!connected || isLeaving}>
             Leave Room
+            {isLeaving ? <span className="button-spinner" aria-hidden="true" /> : null}
           </button>
         </div>
         {!connected && <p>Waiting to reconnect to server.</p>}
