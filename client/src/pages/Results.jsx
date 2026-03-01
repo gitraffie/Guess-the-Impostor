@@ -15,6 +15,10 @@ export default function Results({
   isLeaving
 }) {
   const [showSecretWord, setShowSecretWord] = useState(false);
+  const entryDuration = 450;
+  const stagger = 180;
+  const flipDuration = 800;
+  const baseDelay = 200;
 
   const winnerNames = useMemo(
     () => (result && result.winnerNames ? result.winnerNames : []),
@@ -25,10 +29,6 @@ export default function Results({
     setShowSecretWord(false);
     if (!players.length) return undefined;
 
-    const entryDuration = 450;
-    const stagger = 180;
-    const flipDuration = 800;
-    const baseDelay = 200;
     const totalDelay =
       baseDelay + entryDuration + flipDuration + (players.length - 1) * stagger + 200;
 
@@ -38,13 +38,16 @@ export default function Results({
 
   const resultTitle = result ? result.winner || 'Game Over' : 'Game Over';
   const resultReason = result ? result.reason : '';
+  const flipKey = result
+    ? `${result.winner}-${result.impostorName}-${result.reason}-${secretWord}-${players.length}`
+    : 'no-result';
 
   return (
     <div className="card">
       <h2>Results</h2>
       {result && (
         <div className="panel full">
-          <h3>The {resultTitle} has won!</h3>
+          <h3>The {resultTitle} won!</h3>
           {resultReason && <p>{resultReason}</p>}
         </div>
       )}
@@ -62,6 +65,8 @@ export default function Results({
                 player={player}
                 isWinner={isWinner}
                 isImpostor={isImpostor}
+                autoFlipDelay={baseDelay + entryDuration + index * stagger}
+                autoFlipKey={flipKey}
                 style={{ '--delay': `${index * 180}ms` }}
               />
             );

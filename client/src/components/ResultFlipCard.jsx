@@ -1,10 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BearAvatar from './BearAvatar.jsx';
 
-export default function ResultFlipCard({ player, isWinner, isImpostor, ...rest }) {
+export default function ResultFlipCard({
+  player,
+  isWinner,
+  isImpostor,
+  autoFlipDelay = null,
+  autoFlipKey = null,
+  ...rest
+}) {
   const [isFlipped, setIsFlipped] = useState(false);
   const roleLabel = isImpostor ? 'Impostor' : 'Normal Player';
   const winnerClass = isWinner ? (isImpostor ? 'winner-impostor' : 'winner-player') : '';
+
+  useEffect(() => {
+    setIsFlipped(false);
+  }, [autoFlipKey]);
+
+  useEffect(() => {
+    if (autoFlipDelay === null || autoFlipDelay === undefined) return undefined;
+    const timeout = setTimeout(() => setIsFlipped(true), autoFlipDelay);
+    return () => clearTimeout(timeout);
+  }, [autoFlipDelay, autoFlipKey]);
 
   return (
     <div
