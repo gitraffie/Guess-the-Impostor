@@ -1,11 +1,25 @@
+import { useState } from 'react';
 import BearAvatar from './BearAvatar.jsx';
 
 export default function ResultFlipCard({ player, isWinner, isImpostor, ...rest }) {
+  const [isFlipped, setIsFlipped] = useState(false);
   const roleLabel = isImpostor ? 'Impostor' : 'Normal Player';
   const winnerClass = isWinner ? (isImpostor ? 'winner-impostor' : 'winner-player') : '';
 
   return (
-    <div className={`result-flip-card ${winnerClass}`} {...rest}>
+    <div
+      className={`result-flip-card ${winnerClass} ${isFlipped ? 'is-flipped' : ''}`}
+      onClick={() => setIsFlipped((prev) => !prev)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          setIsFlipped((prev) => !prev);
+        }
+      }}
+      {...rest}
+    >
       <div className="result-flip-inner">
         <div className="result-flip-face result-front">
           <BearAvatar color={player.color} size={70} name={player.name} />

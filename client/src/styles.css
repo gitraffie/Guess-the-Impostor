@@ -13,6 +13,7 @@
   --accent: #ffb703;
   --accent-soft: rgba(255, 183, 3, 0.2);
   --soft-border: rgba(27, 27, 27, 0.08);
+  --modal-layer: 9999;
 }
 
 * {
@@ -173,15 +174,19 @@ button:disabled {
   place-items: center;
   padding: 24px;
   animation: fadeIn 200ms ease-out;
+  z-index: var(--modal-layer);
+  pointer-events: auto;
 }
 
 .modal {
+  position: relative;
   background: #ffffff;
   border-radius: 20px;
   padding: 24px;
   width: min(420px, 100%);
   box-shadow: 0 24px 70px rgba(85, 63, 7, 0.35);
   animation: modalPop 220ms ease-out;
+  z-index: calc(var(--modal-layer) + 1);
 }
 
 .modal h3 {
@@ -200,7 +205,7 @@ button:disabled {
   inset: 0;
   display: grid;
   place-items: center;
-  z-index: 40;
+  z-index: var(--modal-layer);
   background: radial-gradient(circle at center, rgba(20, 16, 6, 0.55), rgba(20, 16, 6, 0.88));
   overflow: hidden;
   animation: fadeIn 220ms ease-out;
@@ -288,6 +293,8 @@ button:disabled {
   transform: translateY(10px);
   animation: resultCardEnter 450ms ease-out forwards;
   animation-delay: var(--delay, 0ms);
+  cursor: pointer;
+  user-select: none;
 }
 
 .result-flip-inner {
@@ -295,8 +302,12 @@ button:disabled {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  animation: resultCardFlip 800ms ease-in-out forwards;
-  animation-delay: calc(var(--delay, 0ms) + 450ms);
+  transition: transform 800ms ease-in-out;
+  transform: rotateX(0deg);
+}
+
+.result-flip-card.is-flipped .result-flip-inner {
+  transform: rotateX(180deg);
 }
 
 .result-flip-face {
@@ -359,6 +370,11 @@ button:disabled {
 .result-flip-card.winner-player .result-back {
   background: linear-gradient(160deg, #e9f6e9 0%, #c9e9c9 100%);
   box-shadow: 0 18px 34px rgba(42, 123, 63, 0.2);
+}
+
+.result-flip-card:focus-visible {
+  outline: 3px solid rgba(255, 183, 3, 0.6);
+  outline-offset: 4px;
 }
 
 .result-secret {
@@ -738,12 +754,6 @@ button:disabled {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes resultCardFlip {
-  to {
-    transform: rotateX(180deg);
   }
 }
 
