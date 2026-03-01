@@ -42,7 +42,7 @@ export default function Results({
       <h2>Results</h2>
       {result && (
         <div className="panel full">
-          <h3>{resultTitle}</h3>
+          <h3>The {resultTitle} has won!</h3>
           {resultReason && <p>{resultReason}</p>}
         </div>
       )}
