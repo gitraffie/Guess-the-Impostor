@@ -53,6 +53,7 @@ export default function Voting({
               <button
                 onClick={() => onSubmitVote(player.id)}
                 disabled={hasVoted || timeUp || isSubmittingVote}
+                className="vote-button"
               >
                 Vote
                 {isSubmittingVote ? <span className="button-spinner" aria-hidden="true" /> : null}

@@ -7,6 +7,7 @@ import Results from './pages/Results.jsx';
 import BearAvatar from './components/BearAvatar.jsx';
 import EliminationAnimation from './components/EliminationAnimation.jsx';
 import LoadingOverlay from './components/LoadingOverlay.jsx';
+import Portal from './components/Portal.jsx';
 import logo from '../images/guess_the_impostor_logo.png';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
@@ -307,9 +308,7 @@ export default function App() {
       <header className="header">
         <div className="brand">
           <img className="logo" src={logo} alt="Guess the Impostor logo" />
-          <h1>Guess the Impostor</h1>
         </div>
-        {roomCode && <span className="room-pill">Room {roomCode}</span>}
       </header>
 
       {error && <div className="error">{error}</div>}
@@ -416,12 +415,14 @@ export default function App() {
       )}
 
       {phase === 'countdown' && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            <h3>Game starting in</h3>
-            <p className="countdown">{Math.max(1, Math.ceil(timerMs / 1000))}s</p>
+        <Portal>
+          <div className="modal-backdrop">
+            <div className="modal">
+              <h3>Game starting in</h3>
+              <p className="countdown">{Math.max(1, Math.ceil(timerMs / 1000))}s</p>
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
 
       {phase === 'elimination' && (
@@ -432,21 +433,23 @@ export default function App() {
       )}
 
       {showLeaveConfirm && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            <h3>Leave room?</h3>
-            <p>You will be removed from the current game.</p>
-            <div className="row">
-              <button className="ghost" onClick={() => setShowLeaveConfirm(false)} disabled={loadingFlags.isLeaving}>
-                Cancel
-              </button>
-              <button onClick={handleLeave} disabled={loadingFlags.isLeaving}>
-                Leave
-                {loadingFlags.isLeaving ? <span className="button-spinner" aria-hidden="true" /> : null}
-              </button>
+        <Portal>
+          <div className="modal-backdrop">
+            <div className="modal">
+              <h3>Leave room?</h3>
+              <p>You will be removed from the current game.</p>
+              <div className="row">
+                <button className="ghost" onClick={() => setShowLeaveConfirm(false)} disabled={loadingFlags.isLeaving}>
+                  Cancel
+                </button>
+                <button onClick={handleLeave} disabled={loadingFlags.isLeaving}>
+                  Leave
+                  {loadingFlags.isLeaving ? <span className="button-spinner" aria-hidden="true" /> : null}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
 
       <LoadingOverlay visible={loadingVisible} message={loadingMessage} />

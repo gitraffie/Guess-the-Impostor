@@ -7,7 +7,9 @@
 :root {
   color-scheme: light;
   font-family: 'Space Grotesk', sans-serif;
-  background: radial-gradient(circle at top, #fff4dd 0%, #f6e1ba 55%, #e2c181 100%);
+  background: radial-gradient(circle at 20% 10%, rgba(120, 88, 214, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(62, 24, 107, 0.4), transparent 55%),
+    radial-gradient(circle at 50% 40%, rgba(22, 10, 47, 0.9), rgba(6, 6, 15, 0.98) 70%);
   color: #1b1b1b;
   --card-bg: rgba(255, 255, 255, 0.92);
   --card-shadow: 0 22px 60px rgba(85, 63, 7, 0.22);
@@ -28,12 +30,65 @@
 body {
   margin: 0;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: radial-gradient(circle at 15% 15%, rgba(92, 140, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(255, 120, 215, 0.12), transparent 50%),
+    linear-gradient(160deg, #0b0f2a 0%, #0b0a1b 45%, #05060f 100%);
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.7) 0, transparent 60%),
+    radial-gradient(1px 1px at 68% 22%, rgba(255, 255, 255, 0.55) 0, transparent 60%),
+    radial-gradient(1px 1px at 88% 40%, rgba(255, 255, 255, 0.65) 0, transparent 60%),
+    radial-gradient(1px 1px at 22% 62%, rgba(255, 255, 255, 0.6) 0, transparent 60%),
+    radial-gradient(1px 1px at 48% 78%, rgba(255, 255, 255, 0.5) 0, transparent 60%),
+    radial-gradient(1px 1px at 5% 30%, rgba(255, 255, 255, 0.55) 0, transparent 60%),
+    radial-gradient(1px 1px at 15% 50%, rgba(255, 255, 255, 0.6) 0, transparent 60%),
+    radial-gradient(1px 1px at 35% 70%, rgba(255, 255, 255, 0.5) 0, transparent 60%),
+    radial-gradient(1px 1px at 52% 55%, rgba(255, 255, 255, 0.55) 0, transparent 60%),
+    radial-gradient(1px 1px at 62% 35%, rgba(255, 255, 255, 0.55) 0, transparent 60%),
+    radial-gradient(1px 1px at 74% 18%, rgba(255, 255, 255, 0.6) 0, transparent 60%),
+    radial-gradient(1px 1px at 82% 72%, rgba(255, 255, 255, 0.5) 0, transparent 60%),
+    radial-gradient(1px 1px at 92% 58%, rgba(255, 255, 255, 0.55) 0, transparent 60%),
+    radial-gradient(1px 1px at 40% 12%, rgba(255, 255, 255, 0.6) 0, transparent 60%),
+    radial-gradient(1px 1px at 28% 86%, rgba(255, 255, 255, 0.55) 0, transparent 60%),
+    radial-gradient(2px 2px at 32% 30%, rgba(255, 255, 255, 0.8) 0, transparent 60%),
+    radial-gradient(2px 2px at 72% 55%, rgba(255, 255, 255, 0.75) 0, transparent 60%),
+    radial-gradient(2px 2px at 55% 12%, rgba(255, 255, 255, 0.7) 0, transparent 60%),
+    radial-gradient(2px 2px at 10% 85%, rgba(255, 255, 255, 0.6) 0, transparent 60%),
+    radial-gradient(2px 2px at 90% 88%, rgba(255, 255, 255, 0.7) 0, transparent 60%);
+  opacity: 0.85;
+  animation: starDrift 32s linear infinite;
+}
+
+body::after {
+  background-image:
+    radial-gradient(140px 140px at 20% 30%, rgba(98, 74, 194, 0.25) 0, transparent 70%),
+    radial-gradient(180px 180px at 70% 18%, rgba(201, 120, 255, 0.18) 0, transparent 72%),
+    radial-gradient(220px 220px at 60% 70%, rgba(58, 120, 214, 0.18) 0, transparent 75%),
+    radial-gradient(1.5px 1.5px at 30% 40%, rgba(255, 255, 255, 0.5) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 75% 65%, rgba(255, 255, 255, 0.45) 0, transparent 60%);
+  opacity: 0.55;
+  animation: nebulaFloat 40s ease-in-out infinite;
 }
 
 .app {
   max-width: 980px;
   margin: 0 auto;
   padding: 36px 28px 96px;
+  position: relative;
+  z-index: 1;
 }
 
 .app.spectator {
@@ -42,19 +97,21 @@ body {
 }
 
 .app.impostor-win {
-  background: #f6c1c1;
+  background: #881414;
   border-radius: 24px;
 }
 
 .app.players-win {
-  background: #c9e9c9;
+  background: #41c941;
   border-radius: 24px;
 }
 
 .header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 12px;
   margin-bottom: 28px;
 }
 
@@ -184,6 +241,8 @@ button:disabled {
 .loading-overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -228,6 +287,8 @@ button:disabled {
 .modal-backdrop {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(20, 16, 6, 0.4);
   display: grid;
   place-items: center;
@@ -262,6 +323,8 @@ button:disabled {
 .elimination-overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   display: grid;
   place-items: center;
   z-index: var(--modal-layer);
@@ -614,6 +677,8 @@ button:disabled {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.7);
   box-shadow: inset 0 0 0 1px var(--soft-border);
+  max-height: 260px;
+  overflow-y: auto;
 }
 
 .color-grid {
@@ -649,6 +714,19 @@ button:disabled {
 .color-swatch.selected {
   border-color: #1b1b1b;
   box-shadow: 0 0 0 3px rgba(27, 27, 27, 0.15), 0 8px 16px rgba(0, 0, 0, 0.18);
+}
+
+.vote-button {
+  min-width: 92px;
+  max-width: 140px;
+  width: 100%;
+}
+
+.clue-warning {
+  position: relative;
+  animation: cluePulse 900ms ease-in-out infinite;
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.35), 0 0 18px rgba(220, 38, 38, 0.4);
 }
 
 .avatar-swatch {
@@ -892,10 +970,44 @@ button:disabled {
   }
 }
 
+@keyframes starDrift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-2%, 1%, 0);
+  }
+}
+
+@keyframes nebulaFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(1.5%, -1%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes cluePulse {
+  0% {
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.35), 0 0 18px rgba(220, 38, 38, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.6), 0 0 26px rgba(220, 38, 38, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.35), 0 0 18px rgba(220, 38, 38, 0.35);
+  }
+}
+
 @media (max-width: 640px) {
   .header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     gap: 12px;
   }
 
@@ -948,7 +1060,7 @@ button:disabled {
   }
 
   .logo {
-    width: 96px;
+    width: 126px;
     height: 96px;
   }
 
@@ -987,11 +1099,15 @@ button:disabled {
 
 @layer components {
   .app {
-    @apply min-h-screen rounded-[28px] border border-white/70 bg-white/65 shadow-glow backdrop-blur-xl;
+    @apply min-h-screen rounded-[28px] border border-white/70 shadow-glow;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 24px 80px rgba(6, 8, 20, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.35);
   }
 
   .header {
-    @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between;
+    @apply flex flex-col items-center justify-center gap-4 text-center;
   }
 
   .brand {
@@ -1003,7 +1119,7 @@ button:disabled {
   }
 
   .room-pill {
-    @apply rounded-full bg-amber-200/80 px-4 py-1 text-sm font-semibold text-amber-900;
+    @apply rounded-full bg-amber-200/80 px-4 py-1 text-sm font-bold text-amber-900;
   }
 
   .card {
@@ -1028,11 +1144,11 @@ button:disabled {
   }
 
   .badge {
-    @apply rounded-full bg-amber-100/80 px-2 py-1 text-xs font-semibold text-amber-900;
+    @apply rounded-full bg-amber-100/80 px-2 py-1 text-xs font-semibold text-white;
   }
 
   .badge.ready {
-    @apply bg-emerald-100 text-emerald-900;
+    @apply bg-emerald-100 text-white;
   }
 
   .ghost {

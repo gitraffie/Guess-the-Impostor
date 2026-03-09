@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import BearAvatar from '../components/BearAvatar.jsx';
 import PlayerList from '../components/PlayerList.jsx';
+import Portal from '../components/Portal.jsx';
 
 function formatMs(ms) {
   const total = Math.ceil(ms / 1000);
@@ -44,20 +45,22 @@ export default function GameRound({
   return (
     <div className="card">
       {showTurnModal && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            <h3>
-              {isMyTurn && turnLabel}
-              {!isMyTurn && (
-                <>
-                  It's <span className="turn-name">{currentPlayer ? currentPlayer.name : ''}</span>'s
-                  turn
-                </>
-              )}
-            </h3>
-            {isMyTurn ? <p>Submit one clue word now.</p> : <p>Please wait.</p>}
+        <Portal>
+          <div className="modal-backdrop">
+            <div className="modal">
+              <h3>
+                {isMyTurn && turnLabel}
+                {!isMyTurn && (
+                  <>
+                    It's <span className="turn-name">{currentPlayer ? currentPlayer.name : ''}</span>'s
+                    turn
+                  </>
+                )}
+              </h3>
+              {isMyTurn ? <p>Submit one clue word now.</p> : <p>Please wait.</p>}
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
       <h2>Round</h2>
       <div className="status-row">
@@ -81,7 +84,7 @@ export default function GameRound({
       </div>
 
       {isMyTurn && (
-        <div className="panel full">
+        <div className={`panel full ${timerMs <= 5000 ? 'clue-warning' : ''}`}>
           <h3>Submit one clue word</h3>
           <p>
             {currentPlayer ? (
