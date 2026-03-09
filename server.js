@@ -305,7 +305,7 @@ function startRound(room) {
 }
 
 function startRoundNow(room, forceNewSecret = false) {
-  if (!['countdown', 'lobby', 'results', 'elimination'].includes(room.phase)) return;
+  if (!['countdown', 'lobby', 'results', 'elimination', 'voting'].includes(room.phase)) return;
   clearRoundTimers(room);
   if (room.phase === 'results') {
     room.roundNumber = 0;
