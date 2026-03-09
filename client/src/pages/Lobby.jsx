@@ -55,8 +55,8 @@ export default function Lobby({
               value={name}
               onChange={(event) => setName(event.target.value)}
             />
-            <div className="color-picker">
-              <p>Choose your avatar</p>
+            <details className="color-picker">
+              <summary>Choose your avatar</summary>
               <div className="color-grid avatar-grid">
                 {PLAYER_COLORS.map((entry, index) => (
                   <button
@@ -77,7 +77,7 @@ export default function Lobby({
                   </button>
                 ))}
               </div>
-            </div>
+            </details>
             <button
               onClick={() => onCreate(name, selectedColor)}
               disabled={!canSubmit || isCreating}
@@ -113,8 +113,8 @@ export default function Lobby({
               value={name}
               onChange={(event) => setName(event.target.value)}
             />
-            <div className="color-picker">
-              <p>Choose your avatar</p>
+            <details className="color-picker">
+              <summary>Choose your avatar</summary>
               <div className="color-grid avatar-grid">
                 {PLAYER_COLORS.map((entry, index) => (
                   <button
@@ -135,7 +135,7 @@ export default function Lobby({
                   </button>
                 ))}
               </div>
-            </div>
+            </details>
             <div className="row">
               <button
                 onClick={() => onJoin(joinCode, name, selectedColor)}

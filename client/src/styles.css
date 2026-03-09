@@ -573,9 +573,47 @@ button:disabled {
   margin: 14px 0;
 }
 
-.color-picker p {
-  margin: 0 0 8px;
+.color-picker summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 0 0 1px var(--soft-border);
   font-weight: 600;
+  color: var(--warm-ink);
+  cursor: pointer;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.color-picker summary::-webkit-details-marker {
+  display: none;
+}
+
+.color-picker summary::after {
+  content: '⌄';
+  font-size: 0.9rem;
+  transition: transform 160ms ease;
+}
+
+.color-picker[open] summary {
+  box-shadow: inset 0 0 0 1px rgba(27, 27, 27, 0.16);
+  transform: translateY(-1px);
+}
+
+.color-picker[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.color-picker .color-grid {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 0 0 1px var(--soft-border);
 }
 
 .color-grid {
@@ -961,7 +999,7 @@ button:disabled {
   }
 
   .logo {
-    @apply h-20 w-20 rounded-2xl ring-4 ring-white/70 sm:h-24 sm:w-24;
+    @apply h-20 w-20 rounded-2xl ring-4 ring-white/0 sm:h-24 sm:w-24;
   }
 
   .room-pill {
