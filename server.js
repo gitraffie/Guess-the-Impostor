@@ -26,7 +26,17 @@ const wordsPath = path.join(__dirname, 'words.json');
 const categories = JSON.parse(fs.readFileSync(wordsPath, 'utf8'));
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  'https://gitraffie.github.io',
+  'http://localhost:5173',
+  'http://localhost:4173'
+];
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST']
+  })
+);
 app.get('/', (req, res) => {
   res.send('Guess the Impostor server is running.');
 });
@@ -35,7 +45,7 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: allowedOrigins,
     methods: ['GET', 'POST']
   }
 });
