@@ -19,7 +19,17 @@ const PLAYER_COLORS = [
   '#76b041',
   '#6943ff',
   '#ff7aa2',
-  '#3d6cb9'
+  '#3d6cb9',
+  '#ff8c42',
+  '#5f6caf',
+  '#7a4e2a',
+  '#cdb4db',
+  '#2a9d8f',
+  '#f4a261',
+  '#6d6875',
+  '#00a6fb',
+  '#8ac926',
+  '#f72585'
 ];
 
 const wordsPath = path.join(__dirname, 'words.json');
