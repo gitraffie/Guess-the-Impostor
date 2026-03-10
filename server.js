@@ -149,9 +149,10 @@ function getPublicState(room, viewer) {
     base.votes = room.votes.map((v) => {
       const voter = room.players.find((p) => p.id === v.voterId);
       const target = room.players.find((p) => p.id === v.targetId);
+      const targetName = v.targetId === 'skip' ? 'Skip' : target ? target.name : 'Unknown';
       return {
         voterName: voter ? voter.name : 'Unknown',
-        targetName: target ? target.name : 'Unknown'
+        targetName
       };
     });
   }
@@ -441,9 +442,25 @@ function resolveVotes(room) {
   }
 
   const counts = new Map();
+  let skipVotes = 0;
   room.votes.forEach((vote) => {
+    if (vote.targetId === 'skip') {
+      skipVotes += 1;
+      return;
+    }
     counts.set(vote.targetId, (counts.get(vote.targetId) || 0) + 1);
   });
+
+  const majority = Math.floor(alivePlayers.length / 2) + 1;
+  if (skipVotes >= majority) {
+    const useCountdown = room.roundNumber === 1 && !room.countdownUsed;
+    if (useCountdown) {
+      beginCountdown(room, false);
+      return;
+    }
+    startRoundNow(room);
+    return;
+  }
 
   let maxVotes = 0;
   counts.forEach((count) => {
@@ -674,7 +691,7 @@ io.on('connection', (socket) => {
     const player = room.players.find((p) => p.id === playerId && p.socketId === socket.id);
     if (!player) return;
     if (!room.alivePlayerIds || !room.alivePlayerIds.has(playerId)) return;
-    if (!room.alivePlayerIds.has(targetId)) return;
+    if (targetId !== 'skip' && !room.alivePlayerIds.has(targetId)) return;
 
     const already = room.votes.find((v) => v.voterId === playerId);
     if (already) return;

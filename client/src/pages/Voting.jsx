@@ -39,6 +39,19 @@ export default function Voting({
       <p>Vote out the impostor. If everyone votes the impostor, players win.</p>
 
       <div className="panel full">
+        <h3>Skip Vote</h3>
+        <p>If a majority votes skip, no one is eliminated and the next round starts.</p>
+        <button
+          onClick={() => onSubmitVote('skip')}
+          disabled={hasVoted || timeUp || isSubmittingVote}
+          className="ghost"
+        >
+          Skip This Round
+          {isSubmittingVote ? <span className="button-spinner" aria-hidden="true" /> : null}
+        </button>
+      </div>
+
+      <div className="panel full">
         <h3>Players</h3>
         <div className="list">
           {alivePlayers.map((player) => (
