@@ -358,6 +358,16 @@ function startRoundNow(room, forceNewSecret = false) {
       room.turnOrder[nextIndex] = temp;
     }
   }
+  if (room.turnOrder.length > 2 && room.turnOrder[1] === room.impostorId) {
+    const swapIndex = room.turnOrder.findIndex(
+      (id, index) => id !== room.impostorId && index > 1
+    );
+    if (swapIndex > 1) {
+      const temp = room.turnOrder[1];
+      room.turnOrder[1] = room.turnOrder[swapIndex];
+      room.turnOrder[swapIndex] = temp;
+    }
+  }
   room.currentTurnIndex = 0;
   room.currentTurnPlayerId = null;
   room.readyPlayerIds = new Set();
