@@ -284,6 +284,15 @@ button:disabled {
   border: 1px solid #1b1b1b;
 }
 
+.danger {
+  background: #b00000;
+  color: #ffffff;
+}
+
+.danger:hover {
+  background: #980000;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1199,6 +1208,10 @@ button:disabled {
 
   .ghost {
     @apply border border-amber-400/60 bg-transparent text-amber-900 hover:bg-amber-100/60;
+  }
+
+  .danger {
+    @apply bg-red-600 text-white shadow-red-500/30 hover:bg-red-500;
   }
 
   .modal {

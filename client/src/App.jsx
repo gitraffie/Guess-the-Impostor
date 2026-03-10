@@ -36,6 +36,7 @@ export default function App() {
   const [eliminatedPlayerId, setEliminatedPlayerId] = useState('');
   const [pendingAction, setPendingAction] = useState('');
   const [pendingMessage, setPendingMessage] = useState('');
+  const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
 
   function resetClientState() {
     setPhase('lobby');
@@ -261,6 +262,21 @@ export default function App() {
     });
   }
 
+  function handleEndGame() {
+    if (!roomCode) return;
+    if (!connected) {
+      setError('Not connected to server.');
+      return;
+    }
+    beginLoading('end_game', 'Ending game...');
+    socket.emit('end_game', { code: roomCode }, (response) => {
+      if (!response || !response.ok) {
+        setError(response && response.message ? response.message : 'Failed to end game.');
+      }
+      endLoading('end_game');
+    });
+  }
+
   const me = players.find((player) => player.id === playerId);
   const isReady = Boolean(me && me.ready);
   const isAlive = me ? me.alive !== false : true;
@@ -296,8 +312,10 @@ export default function App() {
     isSubmittingClue: pendingAction === 'submit_clue',
     isSubmittingVote: pendingAction === 'submit_vote',
     isPlayingAgain: pendingAction === 'play_again',
-    isLeaving: pendingAction === 'leave_room'
+    isLeaving: pendingAction === 'leave_room',
+    isEnding: pendingAction === 'end_game'
   };
+  const canEndGame = Boolean(roomCode && playerId && hostId && playerId === hostId && phase !== 'lobby');
 
   return (
     <div
@@ -309,6 +327,19 @@ export default function App() {
         <div className="brand">
           <img className="logo" src={logo} alt="Guess the Impostor logo" />
         </div>
+        {canEndGame && (
+          <div className="header-actions">
+            <button
+              type="button"
+              className="danger"
+              onClick={() => setShowEndGameConfirm(true)}
+              disabled={!connected || loadingFlags.isEnding}
+            >
+              End Game
+              {loadingFlags.isEnding ? <span className="button-spinner" aria-hidden="true" /> : null}
+            </button>
+          </div>
+        )}
       </header>
 
       {error && <div className="error">{error}</div>}
@@ -445,6 +476,37 @@ export default function App() {
                 <button onClick={handleLeave} disabled={loadingFlags.isLeaving}>
                   Leave
                   {loadingFlags.isLeaving ? <span className="button-spinner" aria-hidden="true" /> : null}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+
+      {showEndGameConfirm && (
+        <Portal>
+          <div className="modal-backdrop">
+            <div className="modal">
+              <h3>End game now?</h3>
+              <p>Everyone will return to the lobby and be marked ready.</p>
+              <div className="row">
+                <button
+                  className="ghost"
+                  onClick={() => setShowEndGameConfirm(false)}
+                  disabled={loadingFlags.isEnding}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="danger"
+                  onClick={() => {
+                    setShowEndGameConfirm(false);
+                    handleEndGame();
+                  }}
+                  disabled={loadingFlags.isEnding}
+                >
+                  End Game
+                  {loadingFlags.isEnding ? <span className="button-spinner" aria-hidden="true" /> : null}
                 </button>
               </div>
             </div>

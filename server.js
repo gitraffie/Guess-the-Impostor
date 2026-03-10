@@ -498,7 +498,7 @@ function resolveVotes(room) {
   });
 }
 
-function resetRoom(room) {
+function resetRoom(room, { emit = true } = {}) {
   clearRoundTimers(room);
   room.phase = 'lobby';
   room.impostorId = null;
@@ -521,9 +521,17 @@ function resetRoom(room) {
   room.eliminationMessage = null;
   room.eliminatedPlayerId = null;
   room.pendingNext = null;
-  emitState(room);
+  if (emit) {
+    emitState(room);
+  }
 }
 
+function endGame(room) {
+  resetRoom(room, { emit: false });
+  room.replayPending = true;
+  room.readyPlayerIds = new Set(room.players.map((player) => player.id));
+  emitState(room);
+}
 
 io.on('connection', (socket) => {
   socket.on('create_room', ({ name, color }) => {
@@ -711,6 +719,21 @@ io.on('connection', (socket) => {
     room.readyPlayerIds.add(player.id);
     room.replayPending = true;
     emitState(room);
+    if (typeof callback === 'function') callback({ ok: true });
+  });
+
+  socket.on('end_game', ({ code }, callback) => {
+    const room = rooms.get(String(code || '').trim().toUpperCase());
+    if (!room) {
+      if (typeof callback === 'function') callback({ ok: false, message: 'Room not found.' });
+      return;
+    }
+    const host = room.players.find((p) => p.id === room.hostId);
+    if (!host || host.socketId !== socket.id) {
+      if (typeof callback === 'function') callback({ ok: false, message: 'Only the host can end the game.' });
+      return;
+    }
+    endGame(room);
     if (typeof callback === 'function') callback({ ok: true });
   });
 
